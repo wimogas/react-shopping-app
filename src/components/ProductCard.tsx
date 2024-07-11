@@ -17,7 +17,7 @@ type ProductTypes = {
 
 const ProductCard = ({ product }: ProductTypes) => {
     return (
-        <div className="max-w-100 rounded overflow-hidden">
+        <div className="max-w-100 rounded overflow-hidden bg-gray-900">
             <Link to={`/products/${product.id}`}>
                 <div className="products-list-product-image" style={{
                     backgroundImage: 'url(' + product.image + ')'
