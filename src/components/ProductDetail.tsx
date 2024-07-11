@@ -1,7 +1,7 @@
 import {useState} from "react";
 import './ProductDetail.css'
 import {Product} from "./ProductCard.tsx";
-import {addToCart, removeFromCart} from "../slices/cartSlice.ts";
+import {addToCart} from "../slices/cartSlice.ts";
 import {useAppDispatch} from "../store.ts";
 
 type ProductDetailTypes = {
@@ -23,10 +23,6 @@ const ProductDetail = ({ product }: ProductDetailTypes) => {
             product,
             quantity: qty
         }))
-    }
-
-    const handleRemoveFromCart = () => {
-        dispatch(removeFromCart(product.id))
     }
 
     return (
@@ -55,11 +51,6 @@ const ProductDetail = ({ product }: ProductDetailTypes) => {
                     onClick={handleAddToCart}
                     className="bg-green-900 text-white font-bold py-2 px-4 rounded hover:bg-green-800">
                     Add to cart
-                </button>
-                <button
-                    onClick={handleRemoveFromCart}
-                >
-                    Remove from Cart
                 </button>
             </div>
 

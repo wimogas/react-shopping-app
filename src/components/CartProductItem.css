@@ -1,0 +1,8 @@
+.cart-product-image {
+    background-size : contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    background-color: white;
+    width: 50px;
+    height: 50px;
+}
