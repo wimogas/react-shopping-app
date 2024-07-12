@@ -1,21 +1,40 @@
-import {useEffect, useState} from "react";
-import {NavLink} from "react-router-dom";
+import React, {useMemo, useState} from "react";
+import {NavLink, useNavigate} from "react-router-dom";
 import {useAppSelector} from "../../store.ts";
 
 const Header = () => {
 
-    const [qty, setQty] = useState<number>(0);
+    const navigate = useNavigate()
+
+    const [search, setSearch] = useState("");
 
     const { cartItems } = useAppSelector((state) => state.cart)
 
-    useEffect(() => {
+    const qty = useMemo(() => {
         if (cartItems.length > 0) {
-            const totalQty = cartItems.reduce((acc, curr) => acc + curr.quantity, 0)
-            setQty(totalQty)
+            return cartItems.reduce((acc, curr) => acc + curr.quantity, 0)
         } else {
-            setQty(0)
+            return 0
         }
     }, [cartItems])
+
+    const handleKeyDown = (e: React.KeyboardEvent) => {
+        if(e.key === 'Enter') {
+            handleSubmitSearch()
+        }
+    }
+
+    const handleSubmitSearch = () => {
+        if (search.length > 0) {
+            navigate( `/products/s/${search}`)
+        } else {
+            navigate( `/products`)
+        }
+    }
+
+    const handleSearch = (s: string) => {
+        setSearch(s)
+    }
 
     return (
         <header className="bg-gray-900 text-white p-4">
@@ -24,9 +43,17 @@ const Header = () => {
                     <NavLink to={'/'}>Shop</NavLink>
                 </div>
                 <div className="flex-grow flex items-center justify-center">
-                    <input className="w-full max-w-3xl px-4 py-2 bg-gray-700 rounded"
-                       type="text"
-                       placeholder="Search"/>
+                    <input
+                        className="w-full max-w-3xl px-4 py-2 bg-gray-700 rounded-l-md"
+                        type="text"
+                        placeholder="Search"
+                        value={search}
+                        onChange={(e) => handleSearch(e.target.value)}
+                        onKeyDown={(e) => handleKeyDown(e)}
+                    />
+                    <button className="bg-gray-800 rounded-r-md py-2 px-4 hover:bg-gray-600"
+                        onClick={handleSubmitSearch}
+                    >Search</button>
                 </div>
                 <div>
                     <NavLink to={'/cart'} className="hover:text-gray-400 flex items-center">

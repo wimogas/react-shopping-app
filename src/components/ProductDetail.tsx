@@ -14,8 +14,12 @@ const ProductDetail = ({ product }: ProductDetailTypes) => {
 
     const [qty, setQty] = useState<number>(1);
 
-    const handleChangeQty = () => {
-        setQty(qty ? qty + 1 : 1);
+    const handleChangeQty = (val: number) => {
+        if (val > 0) {
+            setQty(val);
+        } else {
+            setQty(1)
+        }
     }
 
     const handleAddToCart = () => {
@@ -45,7 +49,7 @@ const ProductDetail = ({ product }: ProductDetailTypes) => {
                     type="number"
                     placeholder="Quantity"
                     value={qty}
-                    onChange={handleChangeQty}
+                    onChange={(e) => handleChangeQty(parseInt(e.target.value))}
                 />
                 <button
                     onClick={handleAddToCart}

@@ -47,7 +47,11 @@ const cartSlice = createSlice({
         removeFromCart: (state, action: PayloadAction<number>) => {
             state.cartItems = state.cartItems.filter((product: CartProduct) => product.product.id !== action.payload)
             state.total = +state.cartItems.reduce((acc,curr) => acc + (curr.product.price * curr.quantity), 0).toFixed(2)
-            localStorage.setItem('CART', JSON.stringify(state))
+            if (state.cartItems.length > 0) {
+                localStorage.setItem('CART', JSON.stringify(state))
+            } else {
+                localStorage.removeItem('CART');
+            }
         },
         checkout: (state) => {
             state.cartItems = [];

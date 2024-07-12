@@ -16,6 +16,9 @@ type ProductTypes = {
 }
 
 const ProductCard = ({ product }: ProductTypes) => {
+
+    const trimmedTitle = product.title.length > 20 ? product.title.slice(0, 20) + ' ...' : product.title
+
     return (
         <div className="max-w-100 rounded overflow-hidden bg-gray-900">
             <Link to={`/products/${product.id}`}>
@@ -25,7 +28,7 @@ const ProductCard = ({ product }: ProductTypes) => {
             </Link>
             <div className="px-6 py-4">
                 <Link to={`/products/${product.id}`}>
-                    <div className="text-white font-bold text-xl mb-2">{product.title}</div>
+                    <div className="text-white font-bold text-xl mb-2">{trimmedTitle}</div>
                 </Link>
             </div>
             <div className="px-6 pt-4 pb-2 flex justify-between items-center">
