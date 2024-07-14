@@ -3,13 +3,18 @@ import {productsApiSlice} from "../slices/productsApiSlice.ts";
 import Spinner from "../shared/components/Spinner.tsx";
 import Pagination from "../shared/components/Pagination.tsx";
 import {useMemo, useState} from "react";
-import {useParams, useSearchParams} from "react-router-dom";
+import {useLocation, useParams, useSearchParams} from "react-router-dom";
 import Filter from "../shared/components/Filter.tsx";
 
-const HomePage = () => {
+export type QueryObject = {
+    [k: string]: string
+}
 
+const HomePage = () => {
+    const location = useLocation();
     const { page, search } = useParams()
     const [searchParams] = useSearchParams()
+    const {search: queryStr} = location
 
     const [paginateResults, setPaginateResults] = useState(false)
     const [pages, setPages] = useState(0)
@@ -20,14 +25,29 @@ const HomePage = () => {
         isError,
         isSuccess} = productsApiSlice.useGetProductsQuery()
 
+    const query: QueryObject = useMemo(() => {
+        const qArr = Array.from(searchParams.entries())
+        const qObj: QueryObject = {}
+        qArr.map(q => qObj[q[0] as keyof QueryObject] = q[1])
+        return qObj
+    }, [searchParams])
+
     const paginatedProducts = useMemo(() => {
         let computed = products ? [...products] : []
-        if (search && products) {
+        if (search) {
             computed = computed.filter(product => product.title.toLowerCase().includes(search.toLowerCase()))
         }
-        if (searchParams.get('cat') !== null) {
-            const cat = searchParams.get('cat')!
-            computed = computed.filter(product => product.category.toLowerCase() === cat.toLowerCase())
+        if (query['cat'] && query['cat'] !== 'All') {
+            computed = computed.filter(product => product.category.toLowerCase() === query['cat'].toLowerCase())
+        }
+        if (query['orderBy']) {
+            computed = computed.sort((a,b) => {
+                if (query['orderBy'] === 'low') {
+                    return a.price > b.price ? 1 : -1
+                } else {
+                    return a.price < b.price ? 1 : -1
+                }
+            })
         }
         if (computed.length / limit > 1) {
             setPaginateResults(true)
@@ -40,7 +60,7 @@ const HomePage = () => {
             (page ? (parseInt(page) - 1) * limit : 0),
             (page ? parseInt(page) * limit : limit)
         )
-    }, [products, search, page, limit, searchParams])
+    }, [products, search, page, limit, query])
 
     let content;
 
@@ -53,8 +73,8 @@ const HomePage = () => {
             content = <div className={"flex flex-row gap-5"}>
                 <div>
                     <h2 className={"text-white text-3xl my-4 font-bold"}>Filters</h2>
-                    <Filter k={'cat'} label={'Categories'} filters={['All', 'men\'s clothing', 'women\'s clothing', 'jewelery', 'electronics']}/>
-
+                    <Filter query={query} keyword={'orderBy'} label={'Order By'} filters={['high', 'low']}/>
+                    <Filter query={query} keyword={'cat'} label={'Categories'} filters={['All', 'men\'s clothing', 'women\'s clothing', 'jewelery', 'electronics']}/>
                 </div>
                 <div>
                     <h2 className={"text-white text-3xl my-4 font-bold"}>Products ({paginatedProducts.length})</h2>
@@ -63,7 +83,7 @@ const HomePage = () => {
                             <ProductCard product={product} key={product.id}/>
                         ))}
                     </div>
-                    {paginateResults && <Pagination pages={pages} page={page ? parseInt(page) : 1} search={search} />}
+                    {paginateResults && <Pagination pages={pages} page={page ? parseInt(page) : 1} search={search} query={queryStr} />}
 
                 </div>
             </div>
