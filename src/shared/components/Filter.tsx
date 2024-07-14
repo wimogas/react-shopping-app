@@ -1,4 +1,4 @@
-import React, {useMemo, useState} from "react";
+import React, {useEffect, useMemo, useState} from "react";
 
 import {useNavigate} from "react-router-dom";
 import {QueryObject} from "../../pages/HomePage.tsx";
@@ -34,6 +34,12 @@ const Filter = ({ query, keyword, label, filters } : FilterTypes) => {
             search: `${queryStr}${keyword}=${e.target.value}`
         })
     }
+
+    useEffect(() => {
+        if (!query[keyword]) {
+            setSelectedFilter('')
+        }
+    }, [keyword, query]);
 
     return (
         <div className="flex flex-col">

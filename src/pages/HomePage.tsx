@@ -3,7 +3,7 @@ import {productsApiSlice} from "../slices/productsApiSlice.ts";
 import Spinner from "../shared/components/Spinner.tsx";
 import Pagination from "../shared/components/Pagination.tsx";
 import {useMemo, useState} from "react";
-import {useLocation, useParams, useSearchParams} from "react-router-dom";
+import {useLocation, useNavigate, useParams, useSearchParams} from "react-router-dom";
 import Filter from "../shared/components/Filter.tsx";
 
 export type QueryObject = {
@@ -11,6 +11,7 @@ export type QueryObject = {
 }
 
 const HomePage = () => {
+    const navigate = useNavigate()
     const location = useLocation();
     const { page, search } = useParams()
     const [searchParams] = useSearchParams()
@@ -40,9 +41,9 @@ const HomePage = () => {
         if (query['cat'] && query['cat'] !== 'All') {
             computed = computed.filter(product => product.category.toLowerCase() === query['cat'].toLowerCase())
         }
-        if (query['orderBy']) {
+        if (query['orderBy'] && query['orderBy'] !== 'Featured') {
             computed = computed.sort((a,b) => {
-                if (query['orderBy'] === 'low') {
+                if (query['orderBy'] === 'Lower price') {
                     return a.price > b.price ? 1 : -1
                 } else {
                     return a.price < b.price ? 1 : -1
@@ -62,6 +63,10 @@ const HomePage = () => {
         )
     }, [products, search, page, limit, query])
 
+    const handleRemoveFilters = () => {
+        navigate('/products/')
+    }
+
     let content;
 
     if (isLoading) {
@@ -73,8 +78,9 @@ const HomePage = () => {
             content = <div className={"flex flex-row gap-5"}>
                 <div>
                     <h2 className={"text-white text-3xl my-4 font-bold"}>Filters</h2>
-                    <Filter query={query} keyword={'orderBy'} label={'Order By'} filters={['high', 'low']}/>
+                    <Filter query={query} keyword={'orderBy'} label={'Order By'} filters={['Featured', 'Higher price', 'Lower price']}/>
                     <Filter query={query} keyword={'cat'} label={'Categories'} filters={['All', 'men\'s clothing', 'women\'s clothing', 'jewelery', 'electronics']}/>
+                    <button className="bg-gray-900 text-white rounded-md py-2 px-4 hover:bg-gray-700" onClick={handleRemoveFilters}>Remove filters</button>
                 </div>
                 <div>
                     <h2 className={"text-white text-3xl my-4 font-bold"}>Products ({paginatedProducts.length})</h2>
